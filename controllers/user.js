@@ -12,16 +12,11 @@ export const register = async (req, res) => {
 
         if (user) return next(new ErrorHandler("User Already Exist", 400))
 
-
-        // if (user) return res.status(404).json({
-        //     success: false, message: "User Already Exists",
-        // })
-
         const hashedPassword = await bcrypt.hash(password, 10);
 
         user = await User.create({ name, email, password: hashedPassword });
 
-        sendCookie(user, res, "Registered successfully", 201);
+        sendCookie(user, res, "New User", 201);
 
     } catch (error) {
         next(error);
@@ -35,20 +30,10 @@ export const login = async (req, res, next) => {
         let user = await User.findOne({ email }).select("+password");
         if (!user) return next(new ErrorHandler("User Not found", 400))
 
-        // if (!user) {
-        //     return res.status(404).json({
-        //         success: false,
-        //         message: "Invalid Email or password",
-        //     });
-        // }
+        
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) return next(new ErrorHandler("Invalid Email or password", 400))
-
-        // if (!isMatch) return res.status(404).json({
-        //     success: false,
-        //     message: ,
-        // })
 
         sendCookie(user, res, `Welcome back, ${user.name}`, 200);
     } catch (error) {
